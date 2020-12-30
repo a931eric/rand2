@@ -1,117 +1,263 @@
+import 'dart:developer';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+import 'ad_manager.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 
 void main() {
   runApp(MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: '隨機選號器',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-        // This makes the visual density adapt to the platform that you run
-        // the app on. For desktop platforms, the controls will be smaller and
-        // closer together (more dense) than on mobile platforms.
+        primarySwatch: Colors.indigo,
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        textTheme: Theme
+            .of(context)
+            .textTheme
+            .apply(
+          fontSizeFactor: 1.1,
+          fontSizeDelta: 4.0,
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          hintStyle: TextStyle(
+            color: Colors.black12,
+          )
+        )
+
+
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: '隨機選號器'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
 
-  void _incrementCounter() {
+
+class _MyHomePageState extends State<MyHomePage> {
+  Future<void> _initAdMob() {
+    // TODO: Initialize AdMob SDK
+    return FirebaseAdMob.instance.initialize(appId: AdManager.appId);
+  }
+  BannerAd _bannerAd;
+  void _loadBannerAd() {
+    _bannerAd
+      ..load()
+      ..show(anchorType: AnchorType.top);
+  }
+  void initState() {
+    super.initState();
+    _bannerAd = BannerAd(
+      adUnitId: AdManager.bannerAdUnitId,
+      size: AdSize.banner,
+    );
+    _loadBannerAd();
+  }
+
+
+
+
+
+
+  String resultString='';
+  int from,to,count;
+  bool reselect=false;
+  void run() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      resultString='';
+      if(count==0)return;
+      if(validateTo()!=null)return;
+      if(validateCnt()!=null)return;
+      var a=from;
+      var b=to;
+      if(reselect){
+        resultString='[';
+        for(int i=0;i<count-1;i++){
+          resultString+=(Random().nextInt(b-a+1)+a).toString()+', ';
+        }
+        resultString+=(Random().nextInt(b-a+1)+a).toString();
+        resultString+=']';
+      }else{
+        List<int> arr=new List(b-a+1);
+        for(int i=a;i<=b;i++)arr[i-a]=i;
+        arr.shuffle();
+        
+        resultString= arr.sublist(0,count).toString();
+      }
+      
+
     });
+  }
+
+
+  String validateTo(){
+    try {
+      if (from>to)return '必須>=$from';
+    }catch(e){
+      return '';
+    }
+    return null;
+  }
+  String validateCnt(){
+    if(reselect)return null;
+    try {
+      if (count>to-from+1)return '個數過多';
+    }catch(e){
+      return '';
+    }
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    _initAdMob();
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
+
+      body: Padding(padding: const EdgeInsets.all(16), child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          SizedBox(height: 30),
+          Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text('範圍:', style: Theme
+                    .of(context)
+                    .textTheme
+                    .bodyText1),
+                SizedBox(width: 100, height: 70, child:
+                TextField(
+                  style: TextStyle(fontSize: 18),
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    hintText: "起始數字",
+
+
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(4),
+                  ],
+                  onChanged: (String a) {
+                    setState(() {
+                      from = int.parse(a);
+                    });
+                  },
+                ),
+                ),
+                Text('~'),
+                SizedBox(width: 100, height: 70, child:
+                TextField(
+                  style: TextStyle(fontSize: 18),
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    hintText: "結束數字",
+                    errorText: validateTo(),
+                    errorStyle: TextStyle(
+                        fontSize: 15,
+                        height: 0.7
+                    ),
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(4),
+                  ],
+                  onChanged: (String a) {
+                    setState(() {
+                      to = int.parse(a);
+                    });
+                  },
+
+                ),
+                ),
+              ]
+          ),
+          SizedBox(height: 30),
+          Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+
+              children: <Widget>[
+                Text('選取個數:'),
+                SizedBox(width: 100,height: 70, child:
+                TextField(
+                  style: TextStyle(fontSize: 18),
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    hintText: "",
+                    errorText: validateCnt(),
+                    errorStyle: TextStyle(
+                        fontSize: 15,
+                        height: .7,
+                    ),
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(4),
+                  ],
+                  onChanged: (String a) {
+                    setState(() {
+                      count = int.parse(a);
+                    });
+                  },
+                ),
+                ),
+                Text('重複選取:'),
+                Checkbox(value: reselect, onChanged: (value) {
+                  setState(() {
+                    reselect = value;
+                  });
+                })
+              ]
+          ),
+          SizedBox(height: 60),
+          Expanded(
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
+                scrollDirection: Axis.vertical,
+
+
+                child: Text(resultString, style: Theme
+                    .of(context)
+                    .textTheme
+                    .headline3,),
+              )
+          ),
+
+
+        ],
+      ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+
+        backgroundColor: Color.fromARGB(150, 0, 0, 100),
+          focusColor: Color.fromARGB(255, 0, 0, 100),
+          splashColor: Color.fromARGB(255, 0, 0, 100),
+          onPressed: run,
+          child: Text('選號')
+      )
+
     );
   }
 }
