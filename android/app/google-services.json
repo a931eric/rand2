@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "613420983529",
-    "project_id": "rand-6faca",
-    "storage_bucket": "rand-6faca.appspot.com"
+    "project_number": "184999886792",
+    "project_id": "rand2-d2eaf",
+    "storage_bucket": "rand2-d2eaf.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:613420983529:android:19646ccaa3bf339eacfc78",
+        "mobilesdk_app_id": "1:184999886792:android:5ca5b5afb0ac832ca38afd",
         "android_client_info": {
           "package_name": "com.example.rand2"
         }
       },
       "oauth_client": [
         {
-          "client_id": "613420983529-jgg2op2p128anen6eodqgfahe5i3t796.apps.googleusercontent.com",
+          "client_id": "184999886792-7np1ch9fjco05toom3e9vjq2211vl1rf.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyC041LlCmeJTOFVk6caB6GRnEKwwx-Vlp8"
+          "current_key": "AIzaSyCjpuHx6Fhq3cA3jCbabqPQgRpuWAtIFyU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "613420983529-jgg2op2p128anen6eodqgfahe5i3t796.apps.googleusercontent.com",
+              "client_id": "184999886792-7np1ch9fjco05toom3e9vjq2211vl1rf.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
