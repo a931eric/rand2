@@ -4,39 +4,74 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:rand2/multiLang.dart';
 import 'ad_manager.dart';
 import 'package:firebase_admob/firebase_admob.dart';
+import 'settingPage.dart';
 
 void main() {
   runApp(MyApp());
 }
 
+class AppBuilder extends StatefulWidget {
+  final Function(BuildContext) builder;
+
+  const AppBuilder(
+      {Key key, this.builder})
+      : super(key: key);
+
+  @override
+  AppBuilderState createState() => new AppBuilderState();
+
+  static AppBuilderState of(BuildContext context) {
+    return context.ancestorStateOfType(const TypeMatcher<AppBuilderState>());
+  }
+}
+
+class AppBuilderState extends State<AppBuilder> {
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.builder(context);
+  }
+
+  void rebuild() {
+    setState(() {});
+  }
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: '隨機選號器',
-      theme: ThemeData(
-        primarySwatch: Colors.indigo,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        textTheme: Theme
-            .of(context)
-            .textTheme
-            .apply(
-          fontSizeFactor: 1.1,
-          fontSizeDelta: 4.0,
+    return AppBuilder(builder: (context) {
+      return MaterialApp(
+        title: curLang.title,
+        theme: ThemeData(
+            primarySwatch: Colors.indigo,
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+            textTheme: Theme
+                .of(context)
+                .textTheme
+                .apply(
+              fontSizeFactor: 1.1,
+              fontSizeDelta: 4.0,
+            ),
+            inputDecorationTheme: InputDecorationTheme(
+                hintStyle: TextStyle(
+                  color: Colors.black12,
+                )
+            )
+
+
         ),
-        inputDecorationTheme: InputDecorationTheme(
-          hintStyle: TextStyle(
-            color: Colors.black12,
-          )
-        )
-
-
-      ),
-      home: MyHomePage(title: '隨機選號器'),
+        home: MyHomePage(title: curLang.title),
+        initialRoute: '/',
+        routes: {
+          '/Setting': (context) => SettingPage(),
+          '/Setting/Lang': (context) => LanguagesScreen(),
+        },);
+    }
     );
   }
 }
@@ -72,10 +107,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
 
-
-
-
-
   String resultString='';
   int from,to,count;
   bool reselect=false;
@@ -109,7 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String validateTo(){
     try {
-      if (from>to)return '必須>=$from';
+      if (from>to)return curLang.mustBeLEq+'$from';
     }catch(e){
       return '';
     }
@@ -118,7 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String validateCnt(){
     if(reselect)return null;
     try {
-      if (count>to-from+1)return '個數過多';
+      if (count>to-from+1)return curLang.countToLarge;
     }catch(e){
       return '';
     }
@@ -128,9 +159,14 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     _initAdMob();
+    states.add(this);
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(curLang.title),
+        leading: IconButton(
+          icon: Icon(Icons.settings),
+          onPressed:(){ Navigator.pushNamed(context, '/Setting');},
+        ),
       ),
 
       body: Padding(padding: const EdgeInsets.all(16), child: Column(
@@ -140,7 +176,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text('範圍:', style: Theme
+                Text(curLang.range+':', style: Theme
                     .of(context)
                     .textTheme
                     .bodyText1),
@@ -149,7 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: TextStyle(fontSize: 18),
                   textAlign: TextAlign.center,
                   decoration: InputDecoration(
-                    hintText: "起始數字",
+                    hintText: curLang.min,
 
 
                   ),
@@ -171,7 +207,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: TextStyle(fontSize: 18),
                   textAlign: TextAlign.center,
                   decoration: InputDecoration(
-                    hintText: "結束數字",
+                    hintText: curLang.max,
                     errorText: validateTo(),
                     errorStyle: TextStyle(
                         fontSize: 15,
@@ -198,7 +234,7 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
 
               children: <Widget>[
-                Text('選取個數:'),
+                Text(curLang.selectCount),
                 SizedBox(width: 100,height: 70, child:
                 TextField(
                   style: TextStyle(fontSize: 18),
@@ -223,7 +259,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                 ),
                 ),
-                Text('重複選取:'),
+                Text(curLang.repeat),
                 Checkbox(value: reselect, onChanged: (value) {
                   setState(() {
                     reselect = value;
@@ -255,7 +291,7 @@ class _MyHomePageState extends State<MyHomePage> {
           focusColor: Color.fromARGB(255, 0, 0, 100),
           splashColor: Color.fromARGB(255, 0, 0, 100),
           onPressed: run,
-          child: Text('選號')
+          child: Text(curLang.run)
       )
 
     );
