@@ -75,6 +75,9 @@ class _LanguagesScreenState extends State<LanguagesScreen> {
 
   void changeLanguage(Lang lang) {
     curLang=lang;
+    writeInt('lang',langId(lang));
     AppBuilder.of(context).rebuild();
   }
 }
+
+

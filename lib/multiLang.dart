@@ -1,6 +1,17 @@
-
-import 'dart:ffi';
 import 'package:flutter/material.dart';
+
+int langId(Lang lang){
+  if(lang==Langs.zh_tw)return 0;
+  if(lang==Langs.en)return 1;
+  return 0;
+}
+Lang idLang(int id){
+  if(id==0)return Langs.zh_tw;
+  if(id==1)return Langs.en;
+  return Langs.zh_tw;
+}
+
+
 
 class Lang{
   String
