@@ -108,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
   String resultString='';
-  int from,to,count;
+  int from=1,to=30,count=1;
   bool reselect=false;
   void run() {
     setState(() {
@@ -158,6 +158,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController ca,cb,cc;
+    setState(() {
+      ca=TextEditingController(text:from.toString());
+      cb=TextEditingController(text:to.toString());
+      cc=TextEditingController(text:count.toString());
+    });
+
     _initAdMob();
     states.add(this);
     return Scaffold(
@@ -182,12 +189,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     .bodyText1),
                 SizedBox(width: 100, height: 70, child:
                 TextField(
+                  controller: new TextEditingController.fromValue(new TextEditingValue(text:from.toString(),selection: new TextSelection.collapsed(offset: from.toString().length))),
                   style: TextStyle(fontSize: 18),
                   textAlign: TextAlign.center,
                   decoration: InputDecoration(
                     hintText: curLang.min,
-
-
                   ),
                   keyboardType: TextInputType.number,
                   inputFormatters: <TextInputFormatter>[
@@ -204,6 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Text('~'),
                 SizedBox(width: 100, height: 70, child:
                 TextField(
+                  controller: new TextEditingController.fromValue(new TextEditingValue(text:to.toString(),selection: new TextSelection.collapsed(offset: to.toString().length))),
                   style: TextStyle(fontSize: 18),
                   textAlign: TextAlign.center,
                   decoration: InputDecoration(
@@ -237,6 +244,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Text(curLang.selectCount),
                 SizedBox(width: 100,height: 70, child:
                 TextField(
+                  controller: new TextEditingController.fromValue(new TextEditingValue(text:count.toString(),selection: new TextSelection.collapsed(offset: count.toString().length))),
                   style: TextStyle(fontSize: 18),
                   textAlign: TextAlign.center,
                   decoration: InputDecoration(
